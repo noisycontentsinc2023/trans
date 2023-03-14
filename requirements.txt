@@ -1,0 +1,4 @@
+discord.py
+asynicio.py
+os.py
+googletrans.py
