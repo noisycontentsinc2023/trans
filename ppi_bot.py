@@ -63,5 +63,6 @@ async def on_reaction_add(reaction, user):
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
+access_token = os.environ['MTA4MzMxMjUyMzExOTQ0NDAwOQ.GKDP22.hOI1Z9Na75_rmJI_t1aCQucvMhUDuQnkXviAuI']
 #Run the bot
-bot.run('MTA4MzMxMjUyMzExOTQ0NDAwOQ.GKDP22.hOI1Z9Na75_rmJI_t1aCQucvMhUDuQnkXviAuI')
+client.run(access_token)
