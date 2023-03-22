@@ -36,8 +36,7 @@ TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
 intents=discord.Intents.all()
-prefix = '!'
-bot = commands.Bot(command_prefix=prefix, intents=intents)
+bot = commands.Bot(command_prefix='!')
 translator = googletrans.Translator()
 
 # Create a dictionary of flag emojis and their corresponding language codes
@@ -68,9 +67,7 @@ TOKEN = os.getenv("TOKEN")
 #Intents are permissions for the bot that are enabled based on the features necessary to run the bot.
 intents=discord.Intents.all()
 
-#Comman prefix is setup here, this is what you have to type to issue a command to the bot
-prefix = './'
-bot = commands.Bot(command_prefix=prefix, intents=intents)
+
 
 #------------------------------------------------Events------------------------------------------------------#
 
