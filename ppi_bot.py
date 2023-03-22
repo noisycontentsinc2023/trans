@@ -6,6 +6,7 @@ import asyncio
 import os
 import googletrans 
 from discord import Embed
+from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType 
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -93,50 +94,40 @@ async def on_reaction_add(reaction, user):
         embed.add_field(name="발음", value=pronunciation_message, inline=False)
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
+        
+#------------------------------------------------말하------------------------------------------------------#
 
-# Define the embed message with the 6 clickable buttons
-embed = discord.Embed(title='Choose a language:', description='Click one of the buttons below to get the role!', color=0x00ff00)
-embed.add_field(name='German', value=':flag_de:', inline=True)
-embed.add_field(name='Japanese', value=':flag_jp:', inline=True)
-embed.add_field(name='English', value=':flag_gb:', inline=True)
-embed.add_field(name='Chinese', value=':flag_cn:', inline=True)
-embed.add_field(name='Spanish', value=':flag_es:', inline=True)
-embed.add_field(name='French', value=':flag_fr:', inline=True)
+@bot.command()
+async def speak(ctx):
+    embed = discord.Embed(title="Language roles", description="Click a button to get the role")
 
-# Define the role for the language buttons
-language_role_id = 1076005878290989097
+    buttons = [
+        Button(style=ButtonStyle.blue, label="German"),
+        Button(style=ButtonStyle.blue, label="Japanese"),
+        Button(style=ButtonStyle.blue, label="English"),
+        Button(style=ButtonStyle.blue, label="Chinese"),
+        Button(style=ButtonStyle.blue, label="Spanish"),
+        Button(style=ButtonStyle.blue, label="French"),
+    ]
 
-# Define the click event for each button
+    await ctx.send(embed=embed, components=[buttons])
+
 @bot.event
-async def on_raw_reaction_add(payload):
-    # Get the user who clicked the button
-    user = await bot.fetch_user(payload.user_id)
-    # Check if the reaction is on the embed message and the user is not a bot
-    if payload.message_id == embed_msg.id and not user.bot:
-        # Give the user the language role
-        guild = bot.get_guild(payload.guild_id)
-        role = guild.get_role(language_role_id)
-        member = guild.get_member(payload.user_id)
-        await member.add_roles(role)
-        # Send a message to confirm the role was given
-        language = payload.emoji.name
-        message = f"You now have the '{language}' role!"
-        await bot.get_channel(payload.channel_id).send(message)
+async def on_button_click(res):
+    member = res.guild.get_member(res.user.id)
+    role_id = 1076005878290989097
+    role = res.guild.get_role(role_id)
+    role_name = res.component.label
 
-# Define the double-click event for each button
-@bot.event
-async def on_raw_reaction_remove(payload):
-    # Check if the reaction is on the embed message
-    if payload.message_id == embed_msg.id:
-        # Remove the language role from the user
-        guild = bot.get_guild(payload.guild_id)
-        role = guild.get_role(language_role_id)
-        member = guild.get_member(payload.user_id)
+    if role in member.roles:
         await member.remove_roles(role)
-        # Send a message to confirm the role was removed
-        language = payload.emoji.name
-        message = f"The '{language}' role has been removed."
-        await bot.get_channel(payload.channel_id).send(message)        
+        action = "removed"
+    else:
+        await member.add_roles(role)
+        action = "added"
+
+    embed = discord.Embed(title=f"{role_name} role {action}", description=f"{res.user.mention} just {action} the {role_name} role")
+    await res.respond(type=InteractionType.ChannelMessageWithSource, embed=embed)  
         
 
 #Run the bot
