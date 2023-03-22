@@ -8,6 +8,37 @@ import googletrans
 from discord import Embed
 
 translator = googletrans.Translator()
+intents = discord.Intents.default()
+intents.members = True
+
+# Create a dictionary of flag emojis and their corresponding language codes
+flag_emoji_dict = {
+"🇺🇸": "en",
+"🇩🇪": "de",
+"🇫🇷": "fr",
+"🇪🇸": "es",
+"🇮🇹": "it",
+"🇵🇹": "pt",
+"🇷🇺": "ru",
+"🇦🇱": "sq",
+"🇸🇦": "ar",
+"🇧🇦": "bs",
+"🇨🇳": "zh-CN",
+"🇹🇷": "tr",
+"🇵🇱": "pl",
+"🇳🇴": "no",
+"🇸🇬": "sv",
+"🇯🇵": "ja",
+"🇰🇷": "ko",
+}
+
+TOKEN = os.environ['TOKEN']
+PREFIX = os.environ['PREFIX']
+
+intents=discord.Intents.all()
+prefix = '!'
+bot = commands.Bot(command_prefix=prefix, intents=intents)
+translator = googletrans.Translator()
 
 # Create a dictionary of flag emojis and their corresponding language codes
 flag_emoji_dict = {
@@ -63,6 +94,6 @@ async def on_reaction_add(reaction, user):
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
-access_token = os.environ['MTA4MzMxMjUyMzExOTQ0NDAwOQ.GKDP22.hOI1Z9Na75_rmJI_t1aCQucvMhUDuQnkXviAuI']
+
 #Run the bot
-client.run(access_token)
+client.run(TOKEN)
