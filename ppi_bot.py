@@ -10,6 +10,7 @@ from discord import Embed
 translator = googletrans.Translator()
 intents = discord.Intents.default()
 intents.members = True
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Create a dictionary of flag emojis and their corresponding language codes
 flag_emoji_dict = {
