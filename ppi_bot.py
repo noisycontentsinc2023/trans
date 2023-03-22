@@ -7,10 +7,10 @@ import os
 import googletrans 
 from discord import Embed
 
+
 translator = googletrans.Translator()
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Create a dictionary of flag emojis and their corresponding language codes
 flag_emoji_dict = {
@@ -37,35 +37,31 @@ TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
 intents=discord.Intents.all()
-translator = googletrans.Translator()
+prefix = '!'
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 
-# Create a dictionary of flag emojis and their corresponding language codes
-flag_emoji_dict = {
-"🇺🇸": "en",
-"🇩🇪": "de",
-"🇫🇷": "fr",
-"🇪🇸": "es",
-"🇮🇹": "it",
-"🇵🇹": "pt",
-"🇷🇺": "ru",
-"🇦🇱": "sq",
-"🇸🇦": "ar",
-"🇧🇦": "bs",
-"🇨🇳": "zh-CN",
-"🇹🇷": "tr",
-"🇵🇱": "pl",
-"🇳🇴": "no",
-"🇸🇬": "sv",
-"🇯🇵": "ja",
-"🇰🇷": "ko",
-}
 
-#For a more secure, we loaded the .env file and assign the token value to a variable 
-load_dotenv(".env")
-TOKEN = os.getenv("TOKEN")
+#------------------------------------------------번역기------------------------------------------------------#
 
-#Intents are permissions for the bot that are enabled based on the features necessary to run the bot.
-intents=discord.Intents.all()
+@bot.event
+async def on_reaction_add(reaction, user):
+  
+    # Check if the reaction is a flag emoji
+    if reaction.emoji in flag_emoji_dict:
+        # Get the language code corresponding to the flag emoji
+        lang_code = flag_emoji_dict[reaction.emoji]
+        # Get the original message
+        message = reaction.message
+        # Translate the message to the desired language
+        detected_lang = translator.detect(message.content)
+        translated_message = translator.translate(message.content, dest=lang_code).text
+        pronunciation_message = translator.translate(message.content, dest=lang_code).pronunciation
+
+        embed = Embed(title='번역된 문장', description=f'{translated_message}', color=0x00ff00)
+        embed.add_field(name="원문", value=message.content, inline=False)
+        embed.add_field(name="발음", value=pronunciation_message, inline=False)
+       # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
+        await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 
 
