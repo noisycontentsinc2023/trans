@@ -96,55 +96,41 @@ async def on_reaction_add(reaction, user):
         
 #------------------------------------------------말하------------------------------------------------------#
 
-@bot.command(name='말하기')
-async def speak(ctx):
-    # Create the embed message
-    embed = discord.Embed(title='Choose a language:', color=discord.Color.blue())
+
+class MyButton(discord.ui.Button):
+    def __init__(self, label):
+        super().__init__(style=discord.ButtonStyle.grey, label=label)
     
-    # Add the clickable buttons
-    buttons = ['Spanish', 'French', 'Chinese', 'Japanese', 'English', 'German']
-    components = []
-    for button in buttons:
-        components.append(
-            Button(style=ButtonStyle.gray, label=button, custom_id=button)
-        )
-    action_row = ActionRow(*components)
-    
-    # Send the message with the buttons
-    message = await ctx.send(embed=embed, components=[action_row])
-    
-    # Define a callback function to handle button clicks
-    async def callback(interaction: Interaction):
+    async def callback(self, interaction: discord.Interaction):
         # Get the user who clicked the button
         user = interaction.user
-        
-        # Get the button that was clicked
-        button = interaction.data['custom_id']
         
         # Get the message that the button was clicked on
         message = interaction.message
         
         # Update the embed message with the user who clicked the button
         embed = message.embeds[0]
-        embed.add_field(name=button, value=user.mention)
+        embed.add_field(name=self.label, value=user.mention)
         await message.edit(embed=embed)
         
         # Disable the button and remove the user ID if the button is clicked again
-        button_component = [c for c in interaction.message.components[0].components if c.custom_id == button][0]
-        if button_component.disabled:
-            embed = message.embeds[0]
-            for i, field in enumerate(embed.fields):
-                if field.name == button:
-                    embed.remove_field(i)
-                    break
-            await message.edit(embed=embed, components=[action_row])
-        else:
-            button_component.disabled = True
-            button_component.style = ButtonStyle.green
-            await interaction.response.edit_message(components=[action_row])
+        self.disabled = True
+        self.style = discord.ButtonStyle.green
+        await interaction.response.edit_message(view=None)
+
+@bot.command(name='말하기')
+async def speak(ctx):
+    # Create the embed message
+    embed = discord.Embed(title='Choose a language:', color=discord.Color.blue())
     
-    # Wait for button clicks and handle them with the callback function
-    bot.add_callback(callback)
+    # Create the buttons and add them to a view
+    view = discord.ui.View()
+    for label in ['Chinese', 'Japanese', 'Spanish', 'English', 'German', 'French']:
+        button = MyButton(label)
+        view.add_item(button)
+    
+    # Send the message with the embed and the buttons
+    message = await ctx.send(embed=embed, view=view)
         
 
 #Run the bot
