@@ -8,7 +8,6 @@ import googletrans
 from discord import Embed
 
 translator = googletrans.Translator()
-intents = discord.Intents.default()
 intents.members = True
 
 # Create a dictionary of flag emojis and their corresponding language codes
@@ -36,7 +35,6 @@ TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
 intents=discord.Intents.all()
-bot = commands.Bot(command_prefix='!')
 translator = googletrans.Translator()
 
 # Create a dictionary of flag emojis and their corresponding language codes
