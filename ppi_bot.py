@@ -6,7 +6,6 @@ import asyncio
 import os
 import googletrans 
 from discord import Embed
-from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType 
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
