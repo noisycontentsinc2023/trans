@@ -96,4 +96,4 @@ async def on_reaction_add(reaction, user):
 
 
 #Run the bot
-client.run(TOKEN)
+bot.run(TOKEN)
