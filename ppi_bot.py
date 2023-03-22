@@ -97,37 +97,55 @@ async def on_reaction_add(reaction, user):
         
 #------------------------------------------------말하------------------------------------------------------#
 
-@bot.command()
+@bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="Language roles", description="Click a button to get the role")
-
-    buttons = [
-        Button(style=ButtonStyle.blue, label="German"),
-        Button(style=ButtonStyle.blue, label="Japanese"),
-        Button(style=ButtonStyle.blue, label="English"),
-        Button(style=ButtonStyle.blue, label="Chinese"),
-        Button(style=ButtonStyle.blue, label="Spanish"),
-        Button(style=ButtonStyle.blue, label="French"),
-    ]
-
-    await ctx.send(embed=embed, components=[buttons])
-
-@bot.event
-async def on_button_click(res):
-    member = res.guild.get_member(res.user.id)
-    role_id = 1076005878290989097
-    role = res.guild.get_role(role_id)
-    role_name = res.component.label
-
-    if role in member.roles:
-        await member.remove_roles(role)
-        action = "removed"
-    else:
-        await member.add_roles(role)
-        action = "added"
-
-    embed = discord.Embed(title=f"{role_name} role {action}", description=f"{res.user.mention} just {action} the {role_name} role")
-    await res.respond(type=InteractionType.ChannelMessageWithSource, embed=embed)  
+    # Create the embed message
+    embed = discord.Embed(title='Choose a language:', color=discord.Color.blue())
+    
+    # Add the clickable buttons
+    buttons = ['Spanish', 'French', 'Chinese', 'Japanese', 'English', 'German']
+    components = []
+    for button in buttons:
+        components.append(
+            Button(style=ButtonStyle.gray, label=button, custom_id=button)
+        )
+    action_row = ActionRow(*components)
+    
+    # Send the message with the buttons
+    message = await ctx.send(embed=embed, components=[action_row])
+    
+    # Define a callback function to handle button clicks
+    async def callback(interaction: Interaction):
+        # Get the user who clicked the button
+        user = interaction.user
+        
+        # Get the button that was clicked
+        button = interaction.data['custom_id']
+        
+        # Get the message that the button was clicked on
+        message = interaction.message
+        
+        # Update the embed message with the user who clicked the button
+        embed = message.embeds[0]
+        embed.add_field(name=button, value=user.mention)
+        await message.edit(embed=embed)
+        
+        # Disable the button and remove the user ID if the button is clicked again
+        button_component = [c for c in interaction.message.components[0].components if c.custom_id == button][0]
+        if button_component.disabled:
+            embed = message.embeds[0]
+            for i, field in enumerate(embed.fields):
+                if field.name == button:
+                    embed.remove_field(i)
+                    break
+            await message.edit(embed=embed, components=[action_row])
+        else:
+            button_component.disabled = True
+            button_component.style = ButtonStyle.green
+            await interaction.response.edit_message(components=[action_row])
+    
+    # Wait for button clicks and handle them with the callback function
+    bot.add_callback(callback)
         
 
 #Run the bot
