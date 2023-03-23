@@ -70,10 +70,9 @@ intents.typing = False
 intents.presences = False
 
 class ButtonClick(discord.ui.Button):
-    def __init__(self, label, user_mentions, button_view):
+    def __init__(self, label):
         super().__init__(label=label)
-        self.user_mentions = user_mentions
-        self.button_view = button_view
+        self.user_mentions = []
 
     async def callback(self, interaction: discord.Interaction):
         user = interaction.user
@@ -83,33 +82,30 @@ class ButtonClick(discord.ui.Button):
             self.user_mentions.append(user)
 
         embed = discord.Embed(title="말하기 스터디 참여 현황")
-        for button in self.button_view.children:
+        for button in interaction.message.view.children:
             mentions_str = " ".join([f"{user.mention}" for user in button.user_mentions])
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
         await interaction.response.edit_message(embed=embed)
 
 @bot.command(name='말하기')
 async def speak(ctx):
-    user_mentions = []
-    button_view = discord.ui.View()
-
     buttons = [
-        ButtonClick("스페인어", user_mentions, button_view),
-        ButtonClick("중국어", user_mentions, button_view),
-        ButtonClick("일본어", user_mentions, button_view),
-        ButtonClick("영어", user_mentions, button_view),
-        ButtonClick("프랑스어", user_mentions, button_view),
-        ButtonClick("독일어", user_mentions, button_view),
+        ButtonClick("스페인어"),
+        ButtonClick("중국어"),
+        ButtonClick("일본어"),
+        ButtonClick("영어"),
+        ButtonClick("프랑스어"),
+        ButtonClick("독일어"),
     ]
 
+    view = discord.ui.View()
     for button in buttons:
-        button_view.add_item(button)
+        view.add_item(button)
 
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
         embed.add_field(name=button.label, value="No one has clicked yet!", inline=True)
-    await ctx.send(embed=embed, view=button_view)
-
+    await ctx.send(embed=embed, view=view)
 
         
 #Run the bot
