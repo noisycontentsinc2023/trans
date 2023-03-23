@@ -70,9 +70,10 @@ intents.typing = False
 intents.presences = False
 
 class ButtonClick(discord.ui.Button):
-    def __init__(self, label, user_mentions):
+    def __init__(self, label, user_mentions, view):
         super().__init__(label=label)
         self.user_mentions = user_mentions
+        self.view = view
 
     async def callback(self, interaction: discord.Interaction):
         user = interaction.user
@@ -81,25 +82,26 @@ class ButtonClick(discord.ui.Button):
         else:
             self.user_mentions.append(user)
 
-        mentions_str = " ".join([f"{user.mention}" for user in self.user_mentions])
         embed = discord.Embed(title="말하기 스터디 참여 현황")
-        for button in interaction.message.view.children:
-            embed.add_field(name=button.label, value=button.user_mentions, inline=True)
+        for button in self.view.children:
+            mentions_str = " ".join([f"{user.mention}" for user in button.user_mentions])
+            embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
         await interaction.response.edit_message(embed=embed)
 
 @bot.command(name='말하기')
 async def speak(ctx):
     user_mentions = []
+    view = discord.ui.View()
+
     buttons = [
-        ButtonClick("스페인어", user_mentions),
-        ButtonClick("중국어", user_mentions),
-        ButtonClick("일본어", user_mentions),
-        ButtonClick("영어", user_mentions),
-        ButtonClick("프랑스어", user_mentions),
-        ButtonClick("독일어", user_mentions),
+        ButtonClick("스페인어", user_mentions, view),
+        ButtonClick("중국어", user_mentions, view),
+        ButtonClick("일본어", user_mentions, view),
+        ButtonClick("영어", user_mentions, view),
+        ButtonClick("프랑스어", user_mentions, view),
+        ButtonClick("독일어", user_mentions, view),
     ]
 
-    view = discord.ui.View()
     for button in buttons:
         view.add_item(button)
 
@@ -107,6 +109,7 @@ async def speak(ctx):
     for button in buttons:
         embed.add_field(name=button.label, value="No one has clicked yet!", inline=True)
     await ctx.send(embed=embed, view=view)
+
 
         
 #Run the bot
