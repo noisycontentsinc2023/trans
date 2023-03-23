@@ -69,24 +69,35 @@ async def on_reaction_add(reaction, user):
 intents.typing = False
 intents.presences = False
 
+class CustomView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.user_mentions = {}
+
+    def add_button(self, button):
+        self.add_item(button)
+        self.user_mentions[button.custom_id] = []
+        
 class ButtonClick(discord.ui.Button):
     def __init__(self, label):
-        super().__init__(label=label)
-        self.user_mentions = []
+        super().__init__(label=label, custom_id=label)
 
     async def callback(self, interaction: discord.Interaction):
+        view = interaction.message.components[0]
         user = interaction.user
-        if user in self.user_mentions:
-            self.user_mentions.remove(user)
+        user_mentions = view.user_mentions[self.custom_id]
+
+        if user in user_mentions:
+            user_mentions.remove(user)
         else:
-            self.user_mentions.append(user)
+            user_mentions.append(user)
 
         embed = discord.Embed(title="말하기 스터디 참여 현황")
-        for button in interaction.message.view.children:
-            mentions_str = " ".join([f"{user.mention}" for user in button.user_mentions])
+        for button in view.children:
+            mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
         await interaction.response.edit_message(embed=embed)
-
+        
 @bot.command(name='말하기')
 async def speak(ctx):
     buttons = [
@@ -98,9 +109,9 @@ async def speak(ctx):
         ButtonClick("독일어"),
     ]
 
-    view = discord.ui.View()
+    view = CustomView()
     for button in buttons:
-        view.add_item(button)
+        view.add_button(button)
 
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
