@@ -88,19 +88,57 @@ def save_user_mentions(user_mentions):
         json.dump(serializable_user_mentions, f)
 
 class CustomView(discord.ui.View):
-    def __init__(self, guild):
+    def __init__(self, guild, message_id=None):
         super().__init__(timeout=None)
-        self.message_id = None
+        self.message_id = message_id
+        self.user_mentions = {}
 
-        async def init_user_mentions():
-            self.user_mentions = await load_user_mentions(guild)
-            for button in self.children:
-                self.user_mentions[button.custom_id] = []
-
-        asyncio.ensure_future(init_user_mentions())
+        # Load user mentions data from file
+        try:
+            with open(f"user_mentions_{guild.id}.json", "r") as f:
+                self.user_mentions = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
 
     def add_button(self, button):
         self.add_item(button)
+
+        # Initialize button user mentions if not present
+        if button.custom_id not in self.user_mentions:
+            self.user_mentions[button.custom_id] = []
+
+    async def save_user_mentions(self):
+        # Save the user mentions data to file
+        with open(f"user_mentions_{self.bot.guild.id}.json", "w") as f:
+            json.dump(self.user_mentions, f)
+
+    async def update_user_mentions(self, button, user):
+        user_mentions = self.user_mentions[button.custom_id]
+        guild = button.guild
+        role_id = 1011867929375146054
+        role = guild.get_role(role_id)
+
+        if not role:
+            return
+
+        if user in user_mentions:
+            user_mentions.remove(user)
+            await user.remove_roles(role)
+        else:
+            user_mentions.append(user)
+            await user.add_roles(role)
+
+        await self.save_user_mentions()
+
+    async def on_button_click(self, button, interaction):
+        await self.update_user_mentions(button, interaction.user)
+
+        # Update embed with new user mentions
+        embed = discord.Embed(title="말하기 스터디 참여 현황")
+        for button in self.children:
+            mentions_str = " ".join([f"{user.mention}" for user in self.user_mentions[button.custom_id]])
+            embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 아무도 신청하지 않았어요 :(", inline=True)
+        await interaction.response.edit_message(embed=embed)
         
 class ButtonClick(discord.ui.Button):
     def __init__(self, label, view):
