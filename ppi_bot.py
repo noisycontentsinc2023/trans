@@ -138,7 +138,8 @@ class ButtonClick(discord.ui.Button):
         
 @bot.command(name='말하기')
 async def speak(ctx, message_id: int = None):
-    view = CustomView(ctx.guild)
+    guild = ctx.guild  # get the guild object
+    view = CustomView(guild)
     buttons = [
         ButtonClick("스페인어", view),
         ButtonClick("중국어", view),
@@ -151,7 +152,7 @@ async def speak(ctx, message_id: int = None):
     for button in buttons:
         view.add_button(button)
 
-    view.user_mentions = await load_user_mentions(ctx.guild.id)
+    view.user_mentions = await load_user_mentions(guild)  # pass the guild object to the function
 
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
