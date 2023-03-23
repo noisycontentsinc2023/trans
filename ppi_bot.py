@@ -170,29 +170,6 @@ async def replicate(ctx, role_id: int):
         await member.add_roles(new_role)
 
     await ctx.send(f"Role '{role_to_replicate.name}' has been replicated, and the new role has been assigned to the members with the original role.")
-
-
-@bot.command(name='말하기')
-async def speak(ctx, message_id: int = None):
-    view = CustomView()
-    buttons = [
-        ButtonClick("스페인어", view),
-        ButtonClick("중국어", view),
-        ButtonClick("일본어", view),
-        ButtonClick("영어", view),
-        ButtonClick("프랑스어", view),
-        ButtonClick("독일어", view),
-    ]
-
-    for button in buttons:
-        view.add_button(button)
-
-    view.user_mentions = await load_user_mentions(ctx.guild)
-
-    embed = discord.Embed(title="말하기 스터디 참여 현황")
-    for button in buttons:
-        embed.add_field(name=button.label, value="No one has clicked yet!", inline=True)
-    await ctx.send(embed=embed, view=view)
     
 #Run the bot
 bot.run(TOKEN)
