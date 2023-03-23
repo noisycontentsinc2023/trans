@@ -87,11 +87,19 @@ class ButtonClick(discord.ui.Button):
         view = self.parent_view
         user = interaction.user
         user_mentions = view.user_mentions[self.custom_id]
+        guild = interaction.guild
+        role = discord.utils.get(guild.roles, name=self.label)
+
+        if not role:
+            await interaction.response.send_message(f"Role '{self.label}' not found. Please create this role on the server.", ephemeral=True)
+            return
 
         if user in user_mentions:
             user_mentions.remove(user)
+            await interaction.user.remove_roles(role)
         else:
             user_mentions.append(user)
+            await interaction.user.add_roles(role)
 
         embed = discord.Embed(title="말하기 스터디 참여 현황")
         for button in view.children:
