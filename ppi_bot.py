@@ -90,8 +90,12 @@ def save_user_mentions(user_mentions):
 class CustomView(discord.ui.View):
     def __init__(self, guild):
         super().__init__(timeout=None)
-        self.user_mentions = load_user_mentions(guild)
         self.message_id = None
+
+        async def init_user_mentions():
+            self.user_mentions = await load_user_mentions(guild)
+        
+        asyncio.ensure_future(init_user_mentions())
 
     def add_button(self, button):
         self.add_item(button)
