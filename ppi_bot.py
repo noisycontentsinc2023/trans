@@ -66,71 +66,43 @@ async def on_reaction_add(reaction, user):
 
 
 #------------------------------------------------Events------------------------------------------------------#
+intents.typing = False
+intents.presences = False
 
-@bot.event
-async def on_reaction_add(reaction, user):
-  
-    # Check if the reaction is a flag emoji
-    if reaction.emoji in flag_emoji_dict:
-        # Get the language code corresponding to the flag emoji
-        lang_code = flag_emoji_dict[reaction.emoji]
-        # Get the original message
-        message = reaction.message
-        # Translate the message to the desired language
-        detected_lang = translator.detect(message.content)
-        translated_message = translator.translate(message.content, dest=lang_code).text
-        pronunciation_message =translator.translate(message.content, dest=lang_code).pronunciation
+class ButtonClick(discord.ui.Button):
+    def __init__(self, label, user_mentions):
+        super().__init__(label=label)
+        self.user_mentions = user_mentions
 
-        embed = Embed(title='번역된 문장', description=f'{translated_message}', color=0x00ff00)
-        embed.add_field(name="원문", value=message.content, inline=False)
-        embed.add_field(name="발음", value=pronunciation_message, inline=False)
-       # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
-        await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
-        
-#------------------------------------------------말하------------------------------------------------------#
-
-
-class MyButton(discord.ui.Button):
-    def __init__(self, label):
-        super().__init__(style=discord.ButtonStyle.grey, label=label)
-    
     async def callback(self, interaction: discord.Interaction):
-        # Get the user who clicked the button
         user = interaction.user
-        
-        # Get the message that the button was clicked on
-        message = interaction.message
-        
-        # Update the embed message with the user who clicked the button
-        embed = message.embeds[0]
-        embed.add_field(name=self.label, value=user.mention)
-        await message.edit(embed=embed)
-        
-        # Update the button's label and style
-        self.label = f"{self.label} (Selected)"
-        self.style = discord.ButtonStyle.green
-    
-    async def interaction_check(self, interaction: discord.Interaction):
-        # Disable the button if it has already been clicked
-        return not self.disabled
+        if user in self.user_mentions:
+            self.user_mentions.remove(user)
+        else:
+            self.user_mentions.append(user)
 
-
+        mentions_str = " ".join([user.mention for user in self.user_mentions])
+        embed = discord.Embed(title="Button Clicks", description=mentions_str if mentions_str else "No one has clicked yet!")
+        await interaction.response.edit_message(embed=embed)
+        
 @bot.command(name='말하기')
 async def speak(ctx):
-    # Create the embed message
-    embed = discord.Embed(title='Choose a language:', color=discord.Color.blue())
-    embed.set_footer(text="Selected language: None")
-    
-    # Create the buttons and add them to a view
-    view = discord.ui.View(timeout=None)  # Persist view after a button is clicked
-    languages = ['Chinese', 'Japanese', 'Spanish', 'English', 'German', 'French']
-    for lang in languages:
-        button = MyButton(lang, lang)
-        view.add_item(button)
-    
-    # Send the message with the embed and the buttons
-    message = await ctx.send(embed=embed, view=view)
-        
+    user_mentions = []
+    buttons = [
+        ButtonClick("Button 1", user_mentions),
+        ButtonClick("Button 2", user_mentions),
+        ButtonClick("Button 3", user_mentions),
+        ButtonClick("Button 4", user_mentions),
+        ButtonClick("Button 5", user_mentions),
+        ButtonClick("Button 6", user_mentions),
+    ]
 
+    view = discord.ui.View()
+    for button in buttons:
+        view.add_item(button)
+
+    embed = discord.Embed(title="Button Clicks", description="No one has clicked yet!")
+    await ctx.send(embed=embed, view=view)
+        
 #Run the bot
 bot.run(TOKEN)
