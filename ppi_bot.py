@@ -1,4 +1,5 @@
 import discord
+import json
 from discord.ext import tasks, commands
 from discord.utils import get
 from dotenv import load_dotenv
@@ -69,10 +70,21 @@ async def on_reaction_add(reaction, user):
 intents.typing = False
 intents.presences = False
 
+def load_user_mentions():
+    try:
+        with open("user_mentions.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_user_mentions(user_mentions):
+    with open("user_mentions.json", "w") as f:
+        json.dump(user_mentions, f)
+
 class CustomView(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.user_mentions = {}
+        self.user_mentions = load_user_mentions()
         self.message_id = None
 
     def add_button(self, button):
@@ -109,6 +121,9 @@ class ButtonClick(discord.ui.Button):
             mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
         await interaction.response.edit_message(embed=embed)
+        
+        # Save the updated user_mentions data
+        save_user_mentions(view.user_mentions)
         
 @bot.command(name='말하기')
 async def speak(ctx, message_id: int = None):
