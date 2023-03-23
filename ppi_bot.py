@@ -83,7 +83,7 @@ class ButtonClick(discord.ui.Button):
         super().__init__(label=label, custom_id=label)
 
     async def callback(self, interaction: discord.Interaction):
-        view = interaction.message.view
+        view = interaction.view
         user = interaction.user
         user_mentions = view.user_mentions[self.custom_id]
 
