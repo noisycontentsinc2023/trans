@@ -94,12 +94,13 @@ class CustomView(discord.ui.View):
 
         async def init_user_mentions():
             self.user_mentions = await load_user_mentions(guild)
-        
+            for button in self.children:
+                self.user_mentions[button.custom_id] = []
+
         asyncio.ensure_future(init_user_mentions())
 
     def add_button(self, button):
         self.add_item(button)
-        self.user_mentions[button.custom_id] = []
         
 class ButtonClick(discord.ui.Button):
     def __init__(self, label, view):
