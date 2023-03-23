@@ -74,7 +74,7 @@ def load_user_mentions():
     try:
         with open("user_mentions.json", "r") as f:
             return json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
 def save_user_mentions(user_mentions):
