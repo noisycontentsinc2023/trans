@@ -73,6 +73,7 @@ class CustomView(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.user_mentions = {}
+        self.message_id = None
 
     def add_button(self, button):
         self.add_item(button)
@@ -85,6 +86,7 @@ class ButtonClick(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         view = self.parent_view
+        view.message_id = interaction.message.id
         user = interaction.user
         user_mentions = view.user_mentions[self.custom_id]
         guild = interaction.guild
@@ -109,7 +111,7 @@ class ButtonClick(discord.ui.Button):
         await interaction.response.edit_message(embed=embed)
         
 @bot.command(name='말하기')
-async def speak(ctx):
+async def speak(ctx, message_id: int = None):
     view = CustomView()
     buttons = [
         ButtonClick("스페인어", view),
