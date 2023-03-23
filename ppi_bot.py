@@ -91,9 +91,8 @@ async def on_reaction_add(reaction, user):
 
 
 class MyButton(discord.ui.Button):
-    def __init__(self, label, language):
+    def __init__(self, label):
         super().__init__(style=discord.ButtonStyle.grey, label=label)
-        self.language = language
     
     async def callback(self, interaction: discord.Interaction):
         # Get the user who clicked the button
@@ -102,15 +101,18 @@ class MyButton(discord.ui.Button):
         # Get the message that the button was clicked on
         message = interaction.message
         
-        # Update the embed message with the selected language
+        # Update the embed message with the user who clicked the button
         embed = message.embeds[0]
-        embed.set_footer(text=f"Selected language: {self.language}")
+        embed.add_field(name=self.label, value=user.mention)
         await message.edit(embed=embed)
         
-        # Disable the button and remove the user ID if the button is clicked again
-        self.disabled = True
+        # Update the button's label and style
+        self.label = f"{self.label} (Selected)"
         self.style = discord.ButtonStyle.green
-        await interaction.response.edit_message(view=None)
+    
+    async def interaction_check(self, interaction: discord.Interaction):
+        # Disable the button if it has already been clicked
+        return not self.disabled
 
 
 @bot.command(name='말하기')
