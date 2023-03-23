@@ -147,5 +147,38 @@ async def replicate(ctx, role_id: int):
     await ctx.send(f"Role '{role_to_replicate.name}' has been replicated, and the new role has been assigned to the members with the original role.")
 
 
+@bot.command()
+async def image(ctx):
+    message = ctx.message
+    Text = ""
+    learn = message.content.split(" ")
+    vrsize = len(learn)  # array size
+    vrsize = int(vrsize)
+    for i in range(1, vrsize):  # Recognize text with spaces
+        Text = Text + " " + learn[i]
+    print(Text.strip())  # command entered
+
+    randomNum = random.randrange(0, 40)  # random image number
+
+    location = Text
+    enc_location = urllib.parse.quote(location)
+    hdr = {'User-Agent': 'Mozilla/5.0'}
+    url = 'https://search.naver.com/search.naver?where=image&sm=tab_jum&query=' + enc_location
+    print(url)
+    req = Request(url, headers=hdr)
+    html = urllib.request.urlopen(req)
+    bsObj = bs4.BeautifulSoup(html, "html.parser")
+    imgfind1 = bsObj.find('div', {'class': 'photo_grid _box'})
+    imgfind2 = imgfind1.findAll('a', {'class': 'thumb _thumb'})
+    imgfind3 = imgfind2[randomNum]
+    imgfind4 = imgfind3.find('img')
+    imgsrc = imgfind4.get('data-source')
+    print(imgsrc)
+    embed = discord.Embed(
+        color=discord.Colour.green()
+    )
+    embed.set_image(url=imgsrc)
+    await ctx.send(embed=embed)
+    
 #Run the bot
 bot.run(TOKEN)
