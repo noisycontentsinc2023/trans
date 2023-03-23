@@ -79,11 +79,12 @@ class CustomView(discord.ui.View):
         self.user_mentions[button.custom_id] = []
         
 class ButtonClick(discord.ui.Button):
-    def __init__(self, label):
+    def __init__(self, label, view):
         super().__init__(label=label, custom_id=label)
+        self.parent_view = view
 
     async def callback(self, interaction: discord.Interaction):
-        view = interaction.view
+        view = self.parent_view
         user = interaction.user
         user_mentions = view.user_mentions[self.custom_id]
 
@@ -100,16 +101,16 @@ class ButtonClick(discord.ui.Button):
         
 @bot.command(name='말하기')
 async def speak(ctx):
+    view = CustomView()
     buttons = [
-        ButtonClick("스페인어"),
-        ButtonClick("중국어"),
-        ButtonClick("일본어"),
-        ButtonClick("영어"),
-        ButtonClick("프랑스어"),
-        ButtonClick("독일어"),
+        ButtonClick("스페인어", view),
+        ButtonClick("중국어", view),
+        ButtonClick("일본어", view),
+        ButtonClick("영어", view),
+        ButtonClick("프랑스어", view),
+        ButtonClick("독일어", view),
     ]
 
-    view = CustomView()
     for button in buttons:
         view.add_button(button)
 
