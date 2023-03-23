@@ -110,7 +110,7 @@ async def speak(ctx):
 #------------------------------------------------Events------------------------------------------------------#
 
 
-ROLE_NAME = 'RoleToDuplicate'
+ROLE_NAME = 'MINI'
 
 @bot.command(name='복제')
 async def duplicate_role(ctx):
