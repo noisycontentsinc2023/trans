@@ -70,20 +70,26 @@ async def on_reaction_add(reaction, user):
 intents.typing = False
 intents.presences = False
 
-def load_user_mentions():
+async def load_user_mentions(guild):
     try:
         with open("user_mentions.json", "r") as f:
-            return json.load(f)
+            user_mentions_data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
+    user_mentions = {}
+    for key, user_ids in user_mentions_data.items():
+        user_mentions[key] = [await guild.fetch_member(user_id) for user_id in user_ids]
+    return user_mentions
+
 def save_user_mentions(user_mentions):
+    serializable_user_mentions = {k: [user.id for user in users] for k, users in user_mentions.items()}
     with open("user_mentions.json", "w") as f:
-        json.dump(user_mentions, f)
+        json.dump(serializable_user_mentions, f)
 
 class CustomView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.user_mentions = load_user_mentions()
         self.message_id = None
 
@@ -140,9 +146,11 @@ async def speak(ctx, message_id: int = None):
     for button in buttons:
         view.add_button(button)
 
+    view.user_mentions = await load_user_mentions(ctx.guild)
+
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
-        embed.add_field(name=button.label, value="No one has clicked yet!", inline=True)
+        embed.add_field(name=button.label, value="아직 아무도 신청하지 않았어요 :(", inline=True)
     await ctx.send(embed=embed, view=view)
     
 #------------------------------------------------Events------------------------------------------------------#
