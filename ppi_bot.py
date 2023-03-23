@@ -88,10 +88,11 @@ class ButtonClick(discord.ui.Button):
         user = interaction.user
         user_mentions = view.user_mentions[self.custom_id]
         guild = interaction.guild
-        role = discord.utils.get(guild.roles, name=self.label)
+        role_id = 1011867929375146054
+        role = guild.get_role(role_id)
 
         if not role:
-            await interaction.response.send_message(f"Role '{self.label}' not found. Please create this role on the server.", ephemeral=True)
+            await interaction.response.send_message("Role not found. Please check if the role ID is correct.", ephemeral=True)
             return
 
         if user in user_mentions:
