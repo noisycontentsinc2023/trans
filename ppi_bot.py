@@ -91,8 +91,9 @@ async def on_reaction_add(reaction, user):
 
 
 class MyButton(discord.ui.Button):
-    def __init__(self, label):
+    def __init__(self, label, language):
         super().__init__(style=discord.ButtonStyle.grey, label=label)
+        self.language = language
     
     async def callback(self, interaction: discord.Interaction):
         # Get the user who clicked the button
@@ -101,9 +102,9 @@ class MyButton(discord.ui.Button):
         # Get the message that the button was clicked on
         message = interaction.message
         
-        # Update the embed message with the user who clicked the button
+        # Update the embed message with the selected language
         embed = message.embeds[0]
-        embed.add_field(name=self.label, value=user.mention)
+        embed.set_footer(text=f"Selected language: {self.language}")
         await message.edit(embed=embed)
         
         # Disable the button and remove the user ID if the button is clicked again
@@ -111,15 +112,18 @@ class MyButton(discord.ui.Button):
         self.style = discord.ButtonStyle.green
         await interaction.response.edit_message(view=None)
 
+
 @bot.command(name='말하기')
 async def speak(ctx):
     # Create the embed message
     embed = discord.Embed(title='Choose a language:', color=discord.Color.blue())
+    embed.set_footer(text="Selected language: None")
     
     # Create the buttons and add them to a view
-    view = discord.ui.View()
-    for label in ['Chinese', 'Japanese', 'Spanish', 'English', 'German', 'French']:
-        button = MyButton(label)
+    view = discord.ui.View(timeout=None)  # Persist view after a button is clicked
+    languages = ['Chinese', 'Japanese', 'Spanish', 'English', 'German', 'French']
+    for lang in languages:
+        button = MyButton(lang, lang)
         view.add_item(button)
     
     # Send the message with the embed and the buttons
