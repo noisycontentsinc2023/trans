@@ -88,9 +88,9 @@ def save_user_mentions(user_mentions):
         json.dump(serializable_user_mentions, f)
 
 class CustomView(discord.ui.View):
-    def __init__(self):
+    def __init__(self, guild):
         super().__init__(timeout=None)
-        self.user_mentions = load_user_mentions()
+        self.user_mentions = load_user_mentions(guild)
         self.message_id = None
 
     def add_button(self, button):
@@ -133,7 +133,7 @@ class ButtonClick(discord.ui.Button):
         
 @bot.command(name='말하기')
 async def speak(ctx, message_id: int = None):
-    view = CustomView()
+    view = CustomView(ctx.guild)
     buttons = [
         ButtonClick("스페인어", view),
         ButtonClick("중국어", view),
