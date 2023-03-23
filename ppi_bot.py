@@ -81,11 +81,15 @@ class ButtonClick(discord.ui.Button):
         else:
             self.user_mentions.append(user)
 
-        mentions_str = " ".join([user.mention for user in self.user_mentions])
+        mentions_str = " ".join([f"{user.mention} clicked {self.label}" for user in self.user_mentions])
         embed = discord.Embed(title="Button Clicks", description=mentions_str if mentions_str else "No one has clicked yet!")
         await interaction.response.edit_message(embed=embed)
-        
-@bot.command(name='말하기')
+
+@bot.event
+async def on_ready():
+    print(f"{bot.user.name} is ready!")
+
+@bot.command()
 async def speak(ctx):
     user_mentions = []
     buttons = [
