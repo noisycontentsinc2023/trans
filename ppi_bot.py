@@ -110,22 +110,20 @@ async def speak(ctx):
 #------------------------------------------------Events------------------------------------------------------#
 
 
-ROLE_NAME = 'MINI'
-
 @bot.command(name='복제')
-async def duplicate_role(ctx):
-    role_to_duplicate = discord.utils.get(ctx.guild.roles, name=ROLE_NAME)
-    
-    if not role_to_duplicate:
-        await ctx.send(f"Could not find the role '{ROLE_NAME}'.")
+async def replicate(ctx, role_id: int):
+    role_to_replicate = discord.utils.get(ctx.guild.roles, id=role_id)
+
+    if not role_to_replicate:
+        await ctx.send(f"Could not find the role with ID '{role_id}'.")
         return
 
-    new_role = await ctx.guild.create_role(name=f"{ROLE_NAME} (Duplicate)", permissions=role_to_duplicate.permissions)
-    
-    for member in role_to_duplicate.members:
+    new_role = await ctx.guild.create_role(name=f"{role_to_replicate.name} (Replicate)", permissions=role_to_replicate.permissions)
+
+    for member in role_to_replicate.members:
         await member.add_roles(new_role)
 
-    await ctx.send(f"Role '{ROLE_NAME}' has been duplicated and assigned to the members with the original role.")
+    await ctx.send(f"Role '{role_to_replicate.name}' has been replicated, and the new role has been assigned to the members with the original role.")
 
 
 #Run the bot
