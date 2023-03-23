@@ -106,7 +106,27 @@ async def speak(ctx):
     for button in buttons:
         embed.add_field(name=button.label, value="No one has clicked yet!", inline=True)
     await ctx.send(embed=embed, view=view)
+    
+#------------------------------------------------Events------------------------------------------------------#
 
-        
+
+ROLE_NAME = 'RoleToDuplicate'
+
+@bot.command(name='복제')
+async def duplicate_role(ctx):
+    role_to_duplicate = discord.utils.get(ctx.guild.roles, name=ROLE_NAME)
+    
+    if not role_to_duplicate:
+        await ctx.send(f"Could not find the role '{ROLE_NAME}'.")
+        return
+
+    new_role = await ctx.guild.create_role(name=f"{ROLE_NAME} (Duplicate)", permissions=role_to_duplicate.permissions)
+    
+    for member in role_to_duplicate.members:
+        await member.add_roles(new_role)
+
+    await ctx.send(f"Role '{ROLE_NAME}' has been duplicated and assigned to the members with the original role.")
+
+
 #Run the bot
 bot.run(TOKEN)
