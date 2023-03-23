@@ -85,20 +85,16 @@ class ButtonClick(discord.ui.Button):
         embed = discord.Embed(title="Button Clicks", description=mentions_str if mentions_str else "No one has clicked yet!")
         await interaction.response.edit_message(embed=embed)
 
-@bot.event
-async def on_ready():
-    print(f"{bot.user.name} is ready!")
-
-@bot.command()
+@bot.command(name='말하기')
 async def speak(ctx):
     user_mentions = []
     buttons = [
-        ButtonClick("Button 1", user_mentions),
-        ButtonClick("Button 2", user_mentions),
-        ButtonClick("Button 3", user_mentions),
-        ButtonClick("Button 4", user_mentions),
-        ButtonClick("Button 5", user_mentions),
-        ButtonClick("Button 6", user_mentions),
+        ButtonClick("스페인어", user_mentions),
+        ButtonClick("중국어", user_mentions),
+        ButtonClick("일본어", user_mentions),
+        ButtonClick("영어", user_mentions),
+        ButtonClick("프랑스어", user_mentions),
+        ButtonClick("독일어", user_mentions),
     ]
 
     view = discord.ui.View()
