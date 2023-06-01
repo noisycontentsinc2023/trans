@@ -33,6 +33,7 @@ flag_emoji_dict = {
 "🇯🇵": "ja",
 "🇰🇷": "ko",
 "🇻🇳": "vi",
+"🇮🇩": "id",
 }
 
 TOKEN = os.environ['TOKEN']
