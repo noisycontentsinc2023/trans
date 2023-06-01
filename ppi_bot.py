@@ -60,9 +60,9 @@ async def on_reaction_add(reaction, user):
         translated_message = translator.translate(message.content, dest=lang_code).text
         pronunciation_message = translator.translate(message.content, dest=lang_code).pronunciation
 
-        embed = Embed(title='번역된 문장', description=f'{translated_message}', color=0x00ff00)
-        embed.add_field(name="원문", value=message.content, inline=False)
-        embed.add_field(name="발음", value=pronunciation_message, inline=False)
+        embed = Embed(title='번역 translate', description=f'{translated_message}', color=0x00ff00)
+        embed.add_field(name="원문 original text", value=message.content, inline=False)
+        embed.add_field(name="발음 pronunciation", value=pronunciation_message, inline=False)
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
     
